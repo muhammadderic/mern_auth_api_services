@@ -1,0 +1,21 @@
+{
+  "name": "express-api",
+  "version": "1.0.0",
+  "description": "express boilerplate",
+  "license": "ISC",
+  "author": "muhammadderic",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.15.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
