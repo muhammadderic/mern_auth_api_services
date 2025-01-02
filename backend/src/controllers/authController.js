@@ -1,6 +1,7 @@
 import bcryptjs from "bcryptjs";
 import { responseHandler } from "../helpers/responseHandler.js";
 import { sanitizeUser } from "../helpers/sanitizeUser.js";
+import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.js";
 import { User } from "../models/User.js";
 
 /**
@@ -61,6 +62,9 @@ export const signup = async (req, res) => {
     const savedUser = await user.save();
 
     if (savedUser) {
+      // Generate a JWT token and set it as a cookie in the response
+      generateTokenAndSetCookie(res, savedUser._id);
+
       return responseHandler(res, {
         status: 201,
         success: true,

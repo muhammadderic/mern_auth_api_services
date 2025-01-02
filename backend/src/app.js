@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/authRoutes.js";
 
@@ -16,6 +17,7 @@ app.use(cors({
 }));
 app.use(express.json()); // To parse JSON body
 app.use(express.urlencoded({ extended: true })); // To parse URL-encoded body
+app.use(cookieParser());
 
 // Route
 app.use("/api/v1/auth", authRoutes);
