@@ -56,3 +56,66 @@ export const signup = async (req, res) => {
     });
   }
 };
+
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Validate that all required fields are provided
+    if (!email || !password) {
+      return responseHandler(res, {
+        status: 400,
+        success: false,
+        message: "All fields are required"
+      });
+    }
+
+    // Check if the email valid
+    const user = await User.findOne({ email });
+    if (user) {
+      return responseHandler(res, {
+        status: 400,
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Check if the password valid
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      return responseHandler(res, {
+        status: 400,
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Generate a JWT token and set it as a cookie in the response
+    generateTokenAndSetCookie(res, user._id);
+
+    return responseHandler(res, {
+      status: 200,
+      success: true,
+      message: "Logged in successfully",
+      data: sanitizeUser(user),
+    });
+  } catch (error) {
+    return responseHandler(res, {
+      status: 400,
+      success: false,
+      message: "An error occurred while login process",
+      error: error.message,
+    });
+  }
+};
+
+export const logout = async (req, res) => {
+  // Clear cookie
+  res.clearCookie("token");
+
+  return responseHandler(res, {
+    status: 200,
+    success: true,
+    message: "Logged out successfully",
+  });
+};
