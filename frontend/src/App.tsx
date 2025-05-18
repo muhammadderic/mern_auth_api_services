@@ -11,10 +11,14 @@ type JSXReturnRouteProps = {
 
 // Protect routes that require authentication
 const ProtectedRoute = ({ children }: JSXReturnRouteProps) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return <Navigate to='/login' replace />;
+  }
+
+  if (!user.isVerified) {
+    return <Navigate to='/verify-email' replace />;
   }
 
   return children;
@@ -22,9 +26,9 @@ const ProtectedRoute = ({ children }: JSXReturnRouteProps) => {
 
 // Redirect authenticated users to the home page
 const RedirectAuthenticatedUser = ({ children }: JSXReturnRouteProps) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
-  if (isAuthenticated) {
+  if (isAuthenticated && user?.isVerified) {
     return <Navigate to='/' replace />;
   }
 
