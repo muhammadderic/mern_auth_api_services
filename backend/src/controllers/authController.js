@@ -3,6 +3,7 @@ import { User } from "../models/User.js";
 import { responseHandler } from "../helpers/responseHandler.js";
 import { sanitizeUser } from "../helpers/sanitizeUser.js";
 import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.js";
+import { sendVerificationEmail } from "../resend/emails.js";
 
 export const signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -30,16 +31,24 @@ export const signup = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcryptjs.hash(password, 10);
 
+    // Generate a 6-digit verification token
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
     // Create a new User instance
     const user = new User({
       name,
       email,
       password: hashedPassword,
+      verificationToken,
+      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
     await user.save();
 
     // Generate a JWT token and set it as a cookie in the response
     generateTokenAndSetCookie(res, user._id);
+
+    // Send the verification token to the user's email
+    await sendVerificationEmail(user.email, verificationToken);
 
     return responseHandler(res, {
       status: 201,
