@@ -2,18 +2,20 @@ import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Loader } from "lucide-react";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const { login, isLoading, error } = useAuthStore();
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
     await login({ email, password });
+    navigate("/");
   };
 
   return (
