@@ -71,6 +71,8 @@ function App() {
           path='/verify-email'
           element={<EmailVerificationPage />}
         />
+        {/* catch all routes */}
+        <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
     </div>
   )
