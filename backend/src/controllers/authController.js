@@ -3,7 +3,10 @@ import { User } from "../models/User.js";
 import { responseHandler } from "../helpers/responseHandler.js";
 import { sanitizeUser } from "../helpers/sanitizeUser.js";
 import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.js";
-import { sendVerificationEmail } from "../resend/emails.js";
+import {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} from "../resend/emails.js";
 
 export const signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -127,4 +130,45 @@ export const logout = async (req, res) => {
     success: true,
     message: "Logged out successfully",
   });
+};
+
+export const verifyEmail = async (req, res) => {
+  // Destructure code string from the request body
+  const { verificationCode } = req.body;
+
+  try {
+    // Check verification token
+    const user = await User.findOne({
+      verificationToken: verificationCode.verificationCode,
+      verificationTokenExpiresAt: { $gt: Date.now() },
+    });
+    if (!user) {
+      return responseHandler(res, {
+        status: 400,
+        success: false,
+        message: "Invalid or expired verification code",
+      });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
+    await user.save();
+
+    await sendWelcomeEmail(user.email, user.name);
+
+    return responseHandler(res, {
+      status: 200,
+      success: true,
+      message: "Email verified successfully",
+      data: sanitizeUser(user),
+    });
+  } catch (error) {
+    return responseHandler(res, {
+      status: 500,
+      success: false,
+      message: "An error occurred while verify email process",
+      error: error.message,
+    });
+  }
 };
