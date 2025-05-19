@@ -2,12 +2,14 @@ import axios from "axios";
 import { create } from "zustand/react";
 
 type User = {
-  id: string;
+  _id: string; // refers to mongodb id
   name: string;
   email: string;
-  isVerified: boolean,
-  // add other user properties as needed
-}
+  lastLogin: Date;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
 
 type SignupParams = {
   name: string;
@@ -32,6 +34,7 @@ type AuthStore = {
   signup: (params: SignupParams) => Promise<void>;
   login: (params: LoginParams) => Promise<void>;
   verifyEmail: (params: VerifyEmailParams) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const API_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api/v1/auth" : "/api/v1/auth";
@@ -96,6 +99,18 @@ export const useAuthStore = create<AuthStore>((set) => ({
         error: error.response.data.message || "Error verifying email",
         isLoading: false
       });
+      throw error;
+    }
+  },
+
+  logout: async () => {
+    set({ isLoading: true, error: null });
+
+    try {
+      await axios.post(`${API_URL}/logout`);
+      set({ user: null, isAuthenticated: false, error: null, isLoading: false });
+    } catch (error) {
+      set({ error: "Error logging out", isLoading: false });
       throw error;
     }
   },
