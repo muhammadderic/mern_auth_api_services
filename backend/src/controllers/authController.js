@@ -6,6 +6,7 @@ import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.
 import {
   sendVerificationEmail,
   sendWelcomeEmail,
+  sendPasswordResetEmail,
 } from "../resend/emails.js";
 
 export const signup = async (req, res) => {
@@ -172,3 +173,42 @@ export const verifyEmail = async (req, res) => {
     });
   }
 };
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Check if a user with the given email already exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return responseHandler(res, {
+        status: 400,
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpiresAt = resetTokenExpiresAt;
+    await user.save();
+
+    // Send a forgot password email
+    await sendPasswordResetEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`);
+
+    return responseHandler(res, {
+      status: 200,
+      success: true,
+      message: "Password reset link sent to your email",
+    });
+  } catch (error) {
+    return responseHandler(res, {
+      status: 400,
+      success: false,
+      message: "An error occurred in forgotPassword",
+      error: error.message,
+    });
+  }
+}
