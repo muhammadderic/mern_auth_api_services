@@ -26,15 +26,21 @@ type VerifyEmailParams = {
   verificationCode: string;
 }
 
+type ForgotPasswordParams = {
+  email: string;
+}
+
 type AuthStore = {
   user: User | null;
   isAuthenticated: boolean;
   error: string | null;
   isLoading: boolean;
+  message: string | null;
   signup: (params: SignupParams) => Promise<void>;
   login: (params: LoginParams) => Promise<void>;
   verifyEmail: (params: VerifyEmailParams) => Promise<void>;
   logout: () => Promise<void>;
+  forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
 }
 
 const API_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api/v1/auth" : "/api/v1/auth";
@@ -44,6 +50,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isAuthenticated: false,
   error: null,
   isLoading: false,
+  message: null,
 
   signup: async ({ name, email, password }: SignupParams) => {
     set({ isLoading: true, error: null });
@@ -111,6 +118,25 @@ export const useAuthStore = create<AuthStore>((set) => ({
       set({ user: null, isAuthenticated: false, error: null, isLoading: false });
     } catch (error) {
       set({ error: "Error logging out", isLoading: false });
+      throw error;
+    }
+  },
+
+  forgotPassword: async ({ email }: ForgotPasswordParams) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await axios.post(`${API_URL}/forgot-password`, { email });
+
+      set({
+        message: response.data.message,
+        isLoading: false
+      });
+    } catch (error: any) {
+      set({
+        isLoading: false,
+        error: error.response.data.message || "Error sending reset password email",
+      });
       throw error;
     }
   },
