@@ -1,3 +1,4 @@
+import { formatDate } from "../utils/date";
 import { useAuthStore } from "../store/authStore";
 import { motion } from "motion/react";
 
@@ -31,6 +32,7 @@ const DashboardPage = () => {
           <p className='text-gray-300'>Name: {user?.name}</p>
           <p className='text-gray-300'>Email: {user?.email}</p>
         </motion.div>
+
         <motion.div
           className='p-4 bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700'
           initial={{ opacity: 0, y: 20 }}
@@ -48,6 +50,12 @@ const DashboardPage = () => {
               })
             )}
           </p>
+          <p className='text-gray-300'>
+            <span className='font-bold'>Last Login: </span>
+            {user?.lastLogin && (
+              formatDate(user.lastLogin)
+            )}
+          </p>
         </motion.div>
       </div>
 
@@ -63,7 +71,7 @@ const DashboardPage = () => {
           onClick={handleLogout}
           className='w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
 				font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700
-				 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900'
+				 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 cursor-pointer'
         >
           Logout
         </motion.button>
