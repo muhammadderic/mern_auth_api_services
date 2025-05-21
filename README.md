@@ -1,8 +1,8 @@
-# TaskPilot
+# MERN AUTH API SERVICES
 
 ## Overview
 
-**TaskPilot** is an Authentication API service, commonly used as the core user management system in web or mobile applications.
+**MERN AUTH API SERVICES** is an Authentication API service, commonly used as the core user management system in web or mobile applications.
 
 ## Features
 
@@ -16,7 +16,7 @@
 
 ## Installation
 
-To get started with the **TaskPilot Web**, follow these steps:
+To get started with the **MERN AUTH API SERVICES Web**, follow these steps:
 
 1. **Clone the repository:**
 
