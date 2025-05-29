@@ -11,9 +11,13 @@ type User = {
 type AuthStoreTypes = {
   user: User | null;
   isAuthenticated: boolean;
+  error: string | null;
+  isLoading: boolean;
 }
 
 export const useAuthStore = create<AuthStoreTypes>(() => ({
   user: null,
   isAuthenticated: false,
+  error: null,
+  isLoading: false,
 }))

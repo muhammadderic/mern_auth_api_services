@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   return (
@@ -12,6 +13,15 @@ const LoginPage = () => {
         <h2 className='text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text'>
           Welcome Back
         </h2>
+      </div>
+
+      <div className='px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center'>
+        <p className='text-sm text-gray-400'>
+          Don't have an account?{" "}
+          <Link to='/signup' className='text-green-400 hover:underline'>
+            Sign up
+          </Link>
+        </p>
       </div>
     </motion.div>
   )
