@@ -2,6 +2,7 @@ import bcryptjs from "bcryptjs";
 import { User } from "../models/User.js";
 import { responseHandler } from "../helpers/responseHandler.js";
 import { sanitizeUser } from "../helpers/sanitizeUser.js";
+import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.js";
 
 /**
  * Handles user signup by validating input, checking for existing users,
@@ -60,11 +61,25 @@ export const signup = async (req, res) => {
     });
     const savedUser = await user.save();
 
+    // Only proceed if the user was saved successfully
+    if (savedUser) {
+      // Generate a JWT token and set it as a cookie in the response
+      generateTokenAndSetCookie(res, savedUser._id);
+
+      // Send a success response
+      return responseHandler(res, {
+        status: 201,
+        success: true,
+        message: "User created successfully",
+        data: sanitizeUser(savedUser), // Remove sensitive fields before sending user object
+      });
+    }
+
+    // Fallback if saving failed without throwing
     return responseHandler(res, {
-      status: 201,
-      success: true,
-      message: "User created successfully",
-      data: sanitizeUser(savedUser), // Remove sensitive fields before sending user object
+      status: 500,
+      success: false,
+      message: "Failed to save user",
     });
   } catch (error) {
     return responseHandler(res, {
