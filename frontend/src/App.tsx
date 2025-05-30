@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import EmailVerificationPage from "./pages/EmailVerificationPage";
 
 type JSXReturnRouteProps = {
   children: ReactNode;
@@ -59,6 +60,10 @@ function App() {
               <LoginPage />
             </RedirectAuthenticatedUser>
           }
+        />
+        <Route
+          path='/verify-email'
+          element={<EmailVerificationPage />}
         />
       </Routes>
     </div>
