@@ -5,6 +5,8 @@ type User = {
   _id: string; // refers to mongodb id
   username: string;
   email: string;
+  lastLogin: Date;
+  isVerified: boolean;
   createdAt: string;
   updatedAt: string;
 };
