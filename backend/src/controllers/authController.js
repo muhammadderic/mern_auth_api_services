@@ -161,6 +161,10 @@ export const login = async (req, res) => {
     // Generate a JWT token and set it as a cookie in the response
     generateTokenAndSetCookie(res, user._id);
 
+    // Update last login property
+    user.lastLogin = new Date();
+    await user.save();
+
     return responseHandler(res, {
       status: 200,
       success: true,
