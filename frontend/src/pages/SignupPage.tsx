@@ -2,22 +2,26 @@ import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader, Lock, Mail, User } from "lucide-react";
 
 const SignupPage = () => {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const { error, isLoading } = useAuthStore();
+  const { error, isLoading, signup } = useAuthStore();
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log("name: ", name);
-    console.log("email: ", email);
-    console.log("password: ", password);
+    try {
+      await signup({ email, password, username });
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -38,8 +42,8 @@ const SignupPage = () => {
             icon={User}
             type='text'
             placeholder='Full Name'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
 
           <Input

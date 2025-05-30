@@ -1,3 +1,4 @@
+import axios, { AxiosError } from "axios";
 import { create } from "zustand/react"
 
 type User = {
@@ -8,16 +9,51 @@ type User = {
   updatedAt: string;
 };
 
+type SignupParams = {
+  username: string;
+  email: string;
+  password: string;
+}
+
 type AuthStoreTypes = {
   user: User | null;
   isAuthenticated: boolean;
   error: string | null;
   isLoading: boolean;
+  signup: (params: SignupParams) => Promise<void>;
 }
 
-export const useAuthStore = create<AuthStoreTypes>(() => ({
+const API_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api/v1/auth" : "/api/v1/auth";
+
+export const useAuthStore = create<AuthStoreTypes>((set) => ({
   user: null,
   isAuthenticated: false,
   error: null,
   isLoading: false,
+
+  signup: async ({ username, email, password }: SignupParams) => {
+    set({
+      isLoading: true,
+      error: null
+    });
+
+    try {
+      const response = await axios.post(`${API_URL}/signup`, { email, password, username });
+      set({
+        user: response.data.data,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message: string }>;
+
+      set({
+        error: err.response?.data?.message || "Error signing in",
+        isLoading: false,
+      });
+
+      throw error;
+    }
+  },
 }))
