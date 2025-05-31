@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 type JSXReturnRouteProps = {
   children: ReactNode;
@@ -71,6 +72,14 @@ function App() {
           element={
             <RedirectAuthenticatedUser>
               <ForgotPasswordPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path='/reset-password/:token'
+          element={
+            <RedirectAuthenticatedUser>
+              <ResetPasswordPage />
             </RedirectAuthenticatedUser>
           }
         />
