@@ -7,6 +7,7 @@ import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.
 import {
   sendVerificationEmail,
   sendWelcomeEmail,
+  sendPasswordResetEmail,
 } from "../resend/emails.js";
 
 /**
@@ -263,3 +264,74 @@ export const verifyEmail = async (req, res) => {
     });
   }
 };
+
+/**
+ * Handles password reset requests by generating a reset token and emailing it to the user.
+ *
+ * Expected Request Body:
+ * {
+ *   email: string
+ * }
+ *
+ * Responses:
+ * - 200: Password reset link sent to user's email
+ * - 400: User not found or an error occurred while processing the request
+ *
+ * Dependencies:
+ * - User (Mongoose model for user data)
+ * - crypto (Node.js module for generating secure random tokens)
+ * - sendPasswordResetEmail (Sends password reset email with token link)
+ * - responseHandler (Utility for standardized API responses)
+ */
+export const forgotPassword = async (req, res) => {
+  // Extract the user's email from the request body
+  const { email } = req.body;
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+
+    // If user doesn't exist, respond with a 400 error
+    if (!user) {
+      return responseHandler(res, {
+        status: 400,
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Generate a secure random token for password reset
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    // Set token expiration time (1 hour from now)
+    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
+
+    // Assign the token and expiration to the user document
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpiresAt = resetTokenExpiresAt;
+
+    // Save the updated user document to the database
+    await user.save();
+
+    // Send the password reset link to the user's email
+    await sendPasswordResetEmail(
+      user.email,
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+    );
+
+    // Respond with success message
+    return responseHandler(res, {
+      status: 200,
+      success: true,
+      message: "Password reset link sent to your email",
+    });
+  } catch (error) {
+    // Respond with error message if an exception occurs
+    return responseHandler(res, {
+      status: 400,
+      success: false,
+      message: "An error occurred in forgotPassword",
+      error: error.message,
+    });
+  }
+}
