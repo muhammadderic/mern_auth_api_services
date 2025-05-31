@@ -5,6 +5,7 @@ import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 type JSXReturnRouteProps = {
   children: ReactNode;
@@ -64,6 +65,14 @@ function App() {
         <Route
           path='/verify-email'
           element={<EmailVerificationPage />}
+        />
+        <Route
+          path='/forgot-password'
+          element={
+            <RedirectAuthenticatedUser>
+              <ForgotPasswordPage />
+            </RedirectAuthenticatedUser>
+          }
         />
       </Routes>
     </div>
