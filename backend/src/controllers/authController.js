@@ -6,7 +6,8 @@ import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.
 
 import {
   sendVerificationEmail,
-  sendWelcomeEmail
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
 } from "../resend/emails.js";
 
 /**
@@ -303,6 +304,12 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpiresAt = resetTokenExpiresAt;
     await user.save();
+
+    // Send the password reset link to the user's email
+    await sendPasswordResetEmail(
+      user.email,
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+    );
 
     return responseHandler(res, {
       status: 200,
