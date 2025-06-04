@@ -195,3 +195,63 @@ export const logout = async (req, res) => {
     message: "Logged out successfully",
   });
 };
+
+/**
+ * Verifies a user's email using a verification code and updates their verification status.
+ *
+ * Expected Request Body:
+ * {
+ *   verificationCode: string
+ * }
+ *
+ * Responses:
+ * - 200: Email verified successfully
+ * - 400: Invalid or expired verification code
+ * - 500: An error occurred during the verification process
+ *
+ * Dependencies:
+ * - User (Mongoose model for user data)
+ * - responseHandler (Standardized HTTP response wrapper)
+ * - sendWelcomeEmail (Sends a welcome email after successful verification)
+ * - sanitizeUser (Removes sensitive fields from user object before sending response)
+ */
+export const verifyEmail = async (req, res) => {
+  const { verificationCode } = req.body;
+
+  try {
+    // Look for a user with a matching, non-expired verification token
+    const user = await User.findOne({
+      verificationToken: verificationCode.verificationCode,
+      verificationTokenExpiresAt: { $gt: Date.now() },
+    });
+
+    // If no matching user is found, return an error response
+    if (!user) {
+      return responseHandler(res, {
+        status: 400,
+        success: false,
+        message: "Invalid or expired verification code",
+      });
+    }
+
+    // Mark the user's email as verified and clear the token fields
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
+    await user.save();
+
+    return responseHandler(res, {
+      status: 200,
+      success: true,
+      message: "Email verified successfully",
+      data: sanitizeUser(user),
+    });
+  } catch (error) {
+    return responseHandler(res, {
+      status: 500,
+      success: false,
+      message: "An error occurred while verify email process",
+      error: error.message,
+    });
+  }
+};
