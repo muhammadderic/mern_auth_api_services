@@ -21,3 +21,34 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
 </body>
 </html>
 `;
+
+export const WELCOME_EMAIL_TEMPLATE = `
+<table width="100%" cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 40px;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; padding: 40px;">
+        <tr>
+          <td style="text-align: center;">
+            <h1 style="color: #333333; margin-bottom: 10px;">Welcome to Mucodevde App!</h1>
+            <p style="color: #555555; font-size: 16px; margin-bottom: 30px;">
+              Thank you for verifying your email. We're excited to have you on board!
+            </p>
+            <p style="color: #555555; font-size: 16px;">
+              You can now start exploring the full features of your account. If you have any questions or need help, feel free to reach out to our support team.
+            </p>
+            <a href="http://localhost:3000" target="_blank" style="display: inline-block; margin-top: 30px; padding: 12px 24px; background-color:rgb(17, 205, 26); color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold;">
+              Go to Dashboard
+            </a>
+            <a href="https://muhammadderic-portfolio.vercel.app" target="_blank" style="display: inline-block; margin-top: 30px; padding: 12px 24px; background-color:rgb(17, 205, 26); color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold;">
+              Go to Mucodevde Portfolio
+            </a>
+            <p style="color: #999999; font-size: 12px; margin-top: 40px;">
+              If you didn’t sign up for this account, please ignore this email.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+`

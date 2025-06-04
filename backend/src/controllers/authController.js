@@ -6,6 +6,7 @@ import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.
 
 import {
   sendVerificationEmail,
+  sendWelcomeEmail
 } from "../resend/emails.js";
 
 /**
@@ -73,7 +74,8 @@ export const signup = async (req, res) => {
       // Generate a JWT token and set it as a cookie in the response
       generateTokenAndSetCookie(res, savedUser._id);
 
-
+      // Send the verification token to the user's email
+      await sendVerificationEmail(savedUser.email, verificationToken);
 
       return responseHandler(res, {
         status: 201,
@@ -239,6 +241,9 @@ export const verifyEmail = async (req, res) => {
     user.verificationToken = undefined;
     user.verificationTokenExpiresAt = undefined;
     await user.save();
+
+    // Send a welcome email to the verified user
+    await sendWelcomeEmail(user.email, user.name);
 
     return responseHandler(res, {
       status: 200,

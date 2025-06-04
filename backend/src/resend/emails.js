@@ -1,5 +1,6 @@
 import {
   VERIFICATION_EMAIL_TEMPLATE,
+  WELCOME_EMAIL_TEMPLATE,
 } from "./emailTemplates.js";
 import resend from "./resend.config.js";
 
@@ -16,5 +17,22 @@ export const sendVerificationEmail = async (email, verificationToken) => {
   } catch (error) {
     console.error(`Error sending verification`, error.message);
     throw new Error(`Error sending verification email: ${error}`);
+  }
+};
+
+export const sendWelcomeEmail = async (email) => {
+  try {
+    const response = await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: email,
+      subject: 'Welcome to Mucodevde App',
+      html: WELCOME_EMAIL_TEMPLATE,
+    });
+
+    console.log("Welcome email sent successfully", response);
+  } catch (error) {
+    console.error(`Error sending welcome email`, error);
+
+    throw new Error(`Error sending welcome email: ${error}`);
   }
 };
