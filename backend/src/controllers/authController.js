@@ -4,6 +4,10 @@ import { responseHandler } from "../helpers/responseHandler.js";
 import { sanitizeUser } from "../helpers/sanitizeUser.js";
 import { generateTokenAndSetCookie } from "../helpers/generateTokenAndSetCookie.js";
 
+import {
+  sendVerificationEmail,
+} from "../resend/emails.js";
+
 /**
  * Handles user signup by validating input, checking for existing users,
  * hashing the password with a generated salt, saving the new user to the database,
@@ -53,16 +57,23 @@ export const signup = async (req, res) => {
     const salt = await bcryptjs.genSalt(12); // Use a strong salt round for security
     const hashedPassword = await bcryptjs.hash(password, salt);
 
+    // Generate a 6-digit verification token
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
     const user = new User({
       username,
       email,
       password: hashedPassword,
+      verificationToken,
+      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
     const savedUser = await user.save();
 
     if (savedUser) {
       // Generate a JWT token and set it as a cookie in the response
       generateTokenAndSetCookie(res, savedUser._id);
+
+
 
       return responseHandler(res, {
         status: 201,
