@@ -1,12 +1,15 @@
 import { useAuthStore } from "@/store/authStore";
 import { motion } from "motion/react";
 import { useRef, useState, type KeyboardEvent } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const EmailVerificationPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
+  const navigate = useNavigate();
 
-  const { error, isLoading } = useAuthStore();
+  const { error, isLoading, verifyEmail } = useAuthStore();
 
   const handleChange = (index: number, value: string) => {
     const newCode = [...code];
@@ -50,7 +53,13 @@ const EmailVerificationPage = () => {
       throw new Error("Verification code must be 6 characters");
     }
 
-    console.log(verificationCode);
+    try {
+      await verifyEmail({ verificationCode });
+      navigate("/");
+      toast.success("Email verified successfully");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
