@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
+import { useAuthStore } from "./store/authStore";
 
 type JSXReturnRouteProps = {
   children: ReactNode;
@@ -10,7 +11,7 @@ type JSXReturnRouteProps = {
 
 // Protect routes that require authentication
 const ProtectedRoute = ({ children }: JSXReturnRouteProps) => {
-  const user = false;
+  const { user } = useAuthStore();
 
   if (!user) {
     return <Navigate to='/login' replace />;
@@ -21,7 +22,7 @@ const ProtectedRoute = ({ children }: JSXReturnRouteProps) => {
 
 // Redirect authenticated users to the home page
 const RedirectAuthenticatedUser = ({ children }: JSXReturnRouteProps) => {
-  const isAuthenticated = false;
+  const { isAuthenticated } = useAuthStore();
 
   if (isAuthenticated) {
     return <Navigate to='/' replace />;
