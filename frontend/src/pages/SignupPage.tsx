@@ -2,20 +2,26 @@ import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader, Lock, Mail, User } from "lucide-react";
 
 const SignupPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const { error, isLoading } = useAuthStore();
+  const { error, isLoading, signup } = useAuthStore();
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(username, email);
+    try {
+      await signup({ email, password, username });
+      navigate("/verify-email");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
