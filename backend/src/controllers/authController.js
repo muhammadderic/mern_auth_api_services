@@ -8,6 +8,7 @@ import {
   sendVerificationEmail,
   sendWelcomeEmail,
   sendPasswordResetEmail,
+  sendResetSuccessEmail,
 } from "../resend/emails.js";
 
 /**
@@ -325,3 +326,74 @@ export const forgotPassword = async (req, res) => {
     });
   }
 }
+
+/**
+ * Resets the user's password using a valid reset token and updates the user record.
+ *
+ * Expected Request Body:
+ * {
+ *   password: string
+ * }
+ *
+ * Expected URL Parameters:
+ * {
+ *   token: string
+ * }
+ *
+ * Responses:
+ * - 200: Password reset successful
+ * - 400: Invalid or expired reset token, or other errors during the process
+ *
+ * Dependencies:
+ * - User (Mongoose model for accessing and updating user records)
+ * - bcryptjs (Used to securely hash the new password)
+ * - sendResetSuccessEmail (Sends confirmation email after password reset)
+ * - responseHandler (Utility for standardized API responses)
+ */
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    // Find user by reset token and ensure token is not expired
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpiresAt: { $gt: Date.now() },
+    });
+
+    // If no valid user found, return error response
+    if (!user) {
+      return responseHandler(res, {
+        status: 400,
+        success: false,
+        message: "Invalid or expired reset token",
+      });
+    }
+
+    // Generate a salt and hash the password with it
+    const salt = await bcryptjs.genSalt(12); // Use a strong salt round for security
+    const hashedPassword = await bcryptjs.hash(password, salt);
+
+    // Update user's password and clear reset token and expiration fields
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+    await user.save();
+
+    // Send success confirmation email to the user
+    await sendResetSuccessEmail(user.email);
+
+    return responseHandler(res, {
+      status: 200,
+      success: true,
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    return responseHandler(res, {
+      status: 400,
+      success: false,
+      message: "An error occurred in resetPassword",
+      error: error.message,
+    });
+  }
+};

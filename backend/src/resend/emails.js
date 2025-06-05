@@ -2,6 +2,7 @@ import {
   VERIFICATION_EMAIL_TEMPLATE,
   WELCOME_EMAIL_TEMPLATE,
   PASSWORD_RESET_REQUEST_TEMPLATE,
+  PASSWORD_RESET_SUCCESS_TEMPLATE,
 } from "./emailTemplates.js";
 import resend from "./resend.config.js";
 
@@ -45,6 +46,21 @@ export const sendPasswordResetEmail = async (email, resetURL) => {
       to: email,
       subject: 'Reset your password',
       html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetURL),
+    });
+  } catch (error) {
+    console.error(`Error sending password reset email`, error);
+
+    throw new Error(`Error sending password reset email: ${error}`);
+  }
+};
+
+export const sendResetSuccessEmail = async (email) => {
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: email,
+      subject: 'Password Reset Successful',
+      html: PASSWORD_RESET_SUCCESS_TEMPLATE,
     });
   } catch (error) {
     console.error(`Error sending password reset email`, error);
