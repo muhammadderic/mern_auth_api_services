@@ -1,6 +1,37 @@
+import type { ReactNode } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import DashboardPage from "./pages/DashboardPage";
+
+type JSXReturnRouteProps = {
+  children: ReactNode;
+}
+
+// Protect routes that require authentication
+const ProtectedRoute = ({ children }: JSXReturnRouteProps) => {
+  const user = false;
+
+  if (!user) {
+    return <Navigate to='/login' replace />;
+  }
+
+  return children;
+};
+
 function App() {
   return (
-    <h1 className='text-red-500'>Hello Deric</h1>
+    <div className='min-h-screen bg-gradient-to-br
+    from-gray-900 via-green-900 to-emerald-900 flex items-center justify-center relative overflow-hidden'>
+      <Routes>
+        <Route
+          path='/'
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </div>
   )
 }
 
