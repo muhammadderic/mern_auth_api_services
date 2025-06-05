@@ -21,6 +21,11 @@ type VerifyEmailParams = {
   verificationCode: string;
 }
 
+type LoginParams = {
+  email: string;
+  password: string;
+}
+
 type AuthStore = {
   user: User | null;
   isAuthenticated: boolean;
@@ -28,6 +33,7 @@ type AuthStore = {
   isLoading: boolean;
   signup: (params: SignupParams) => Promise<void>;
   verifyEmail: (params: VerifyEmailParams) => Promise<void>;
+  login: (params: LoginParams) => Promise<void>;
 }
 
 const API_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api/v1/auth" : "/api/v1/auth";
@@ -84,6 +90,29 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
       set({
         error: err.response?.data?.message || "Error verifying email",
+        isLoading: false,
+      });
+
+      throw error;
+    }
+  },
+
+  login: async ({ email, password }: LoginParams) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await axios.post(`${API_URL}/login`, { email, password });
+      set({
+        isAuthenticated: true,
+        user: response.data.data,
+        error: null,
+        isLoading: false,
+      });
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message: string }>;
+
+      set({
+        error: err.response?.data?.message || "Error logging in",
         isLoading: false,
       });
 
