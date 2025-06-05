@@ -13,9 +13,13 @@ type User = {
 type AuthStore = {
   user: User | null;
   isAuthenticated: boolean;
+  error: string | null;
+  isLoading: boolean;
 }
 
 export const useAuthStore = create<AuthStore>(() => ({
   user: null,
   isAuthenticated: false,
+  error: null,
+  isLoading: false,
 }))
