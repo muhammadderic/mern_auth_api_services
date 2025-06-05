@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
+import SignupPage from "./pages/SignupPage";
+import LoginPage from "./pages/LoginPage";
 
 type JSXReturnRouteProps = {
   children: ReactNode;
@@ -17,6 +19,17 @@ const ProtectedRoute = ({ children }: JSXReturnRouteProps) => {
   return children;
 };
 
+// Redirect authenticated users to the home page
+const RedirectAuthenticatedUser = ({ children }: JSXReturnRouteProps) => {
+  const isAuthenticated = false;
+
+  if (isAuthenticated) {
+    return <Navigate to='/' replace />;
+  }
+
+  return children;
+};
+
 function App() {
   return (
     <div className='min-h-screen bg-gradient-to-br
@@ -28,6 +41,22 @@ function App() {
             <ProtectedRoute>
               <DashboardPage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/signup'
+          element={
+            <RedirectAuthenticatedUser>
+              <SignupPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path='/login'
+          element={
+            <RedirectAuthenticatedUser>
+              <LoginPage />
+            </RedirectAuthenticatedUser>
           }
         />
       </Routes>
