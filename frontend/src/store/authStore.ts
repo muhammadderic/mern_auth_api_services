@@ -34,6 +34,7 @@ type AuthStore = {
   signup: (params: SignupParams) => Promise<void>;
   verifyEmail: (params: VerifyEmailParams) => Promise<void>;
   login: (params: LoginParams) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const API_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api/v1/auth" : "/api/v1/auth";
@@ -113,6 +114,32 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
       set({
         error: err.response?.data?.message || "Error logging in",
+        isLoading: false,
+      });
+
+      throw error;
+    }
+  },
+
+  logout: async () => {
+    set({
+      isLoading: true,
+      error: null
+    });
+
+    try {
+      await axios.post(`${API_URL}/logout`);
+      set({
+        user: null,
+        isAuthenticated: false,
+        error: null,
+        isLoading: false
+      });
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message: string }>;
+
+      set({
+        error: err.response?.data?.message || "Error logging out",
         isLoading: false,
       });
 
