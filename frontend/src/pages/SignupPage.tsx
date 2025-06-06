@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader, Lock, Mail, User } from "lucide-react";
+import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
 
 const SignupPage = () => {
   const [username, setUsername] = useState("");
@@ -63,6 +64,7 @@ const SignupPage = () => {
           />
 
           {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
+          <PasswordStrengthMeter password={password} />
 
           <motion.button
             className='mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
