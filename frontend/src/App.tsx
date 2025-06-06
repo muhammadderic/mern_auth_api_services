@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import { useAuthStore } from "./store/authStore";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 type JSXReturnRouteProps = {
   children: ReactNode;
@@ -74,6 +75,16 @@ function App() {
             </RedirectAuthenticatedUser>
           }
         />
+        <Route
+          path='/reset-password/:token'
+          element={
+            <RedirectAuthenticatedUser>
+              <ResetPasswordPage />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        {/* catch all routes */}
+        <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
     </div>
   )

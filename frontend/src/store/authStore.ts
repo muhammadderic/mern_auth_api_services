@@ -30,6 +30,11 @@ type ForgotPasswordParams = {
   email: string;
 }
 
+type ResetPasswordParams = {
+  token: string;
+  password: string;
+}
+
 type AuthStore = {
   user: User | null;
   isAuthenticated: boolean;
@@ -41,6 +46,7 @@ type AuthStore = {
   login: (params: LoginParams) => Promise<void>;
   logout: () => Promise<void>;
   forgotPassword: (params: ForgotPasswordParams) => Promise<void>;
+  resetPassword: (params: ResetPasswordParams) => Promise<void>;
 }
 
 const API_URL = import.meta.env.MODE === "development" ? "http://localhost:5000/api/v1/auth" : "/api/v1/auth";
@@ -172,6 +178,31 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
       set({
         error: err.response?.data?.message || "Error sending reset password email",
+        isLoading: false,
+      });
+
+      throw error;
+    }
+  },
+
+  resetPassword: async ({ token, password }: ResetPasswordParams) => {
+    set({
+      isLoading: true,
+      error: null
+    });
+
+    try {
+      const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
+
+      set({
+        message: response.data.message,
+        isLoading: false
+      });
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message: string }>;
+
+      set({
+        error: err.response?.data?.message || "Error resetting password",
         isLoading: false,
       });
 
